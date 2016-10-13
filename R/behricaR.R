@@ -52,3 +52,22 @@ memInfo <- function() {
   df <- df[rev(order(df)),,drop=F]
   format(df,big.mark=".")
 }
+
+
+#' @export
+unloadAll <- function(maxUnloads=10) {
+
+    basic.packages <- c("package:stats","package:graphics","package:grDevices","package:utils","package:datasets","package:methods","package:base")
+
+    package.list <- search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
+
+    package.list <- setdiff(package.list,basic.packages)
+
+    if (length(package.list)>0)  for (package in package.list) detach(package, character.only=TRUE,unload=T)
+
+    basic.namespaces=c("utils","grDevices","graphics","base","stats","methods","datasets","compiler","tools")
+    for (i in 1:maxUnloads) {
+        sapply(setdiff(loadedNamespaces(),basic.namespaces),FUN=function(x) {try(unloadNamespace(x))})
+    }
+}
+
